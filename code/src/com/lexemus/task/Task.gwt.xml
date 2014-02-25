@@ -1,0 +1,9 @@
+<module rename-to="task">
+
+    <inherits name='com.google.gwt.user.User'/>
+    <inherits name="com.gwtext.GwtExt"/>
+	<inherits name="com.google.gwt.core.Core"/>
+
+	<entry-point class='com.lexemus.task.client.Main'/>
+
+</module>

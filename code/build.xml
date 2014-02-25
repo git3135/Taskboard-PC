@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<project name="Task" default="build" basedir=".">
+  <!-- Configure path to GWT SDK -->
+  <property environment="env"/>
+  <property name="gwt.sdk" value="${env.GWT_HOME}"/>
+  <property name="lexemus.dev" value="${env.LEXEMUS_DEV}"/>
+  <property name="build.home" value="c:/users/jack/lexemus/developer/Task"/>
+  <property name="build.dir" value="${build.home}/war"/>
+
+  <fail unless="gwt.sdk" message="You must set the GWT_HOME environment variable to point to your GWT SDK"/>
+
+  <path id="project.class.path">
+    <pathelement location="${build.home}/war/WEB-INF/classes"/>
+    <pathelement location="${gwt.sdk}/gwt-user.jar"/>
+
+    <fileset dir="${gwt.sdk}" includes="gwt-dev*.jar"/>
+    <fileset dir="${gwt.sdk}" includes="validation-api-*.jar"/>
+    <!-- Add any additional non-server libs (such as JUnit) -->
+    <fileset dir="lib" includes="**/*.jar"/>
+  </path>
+
+  <target name="libs" description="Copy libs to WEB-INF/lib">
+    <mkdir dir="${build.home}/war/WEB-INF/lib" />
+    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet.jar" />
+  </target>
+
+  <target name="javac" depends="libs" description="Compile java source">
+    <mkdir dir="${build.home}/war/WEB-INF/classes"/>
+    <javac srcdir="src" includes="**" encoding="utf-8"
+        destdir="${build.home}/war/WEB-INF/classes"
+        source="1.5" target="1.5" nowarn="true"
+        debug="true" debuglevel="lines,vars,source">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <copy todir="${build.home}/war/WEB-INF/classes">
+      <fileset dir="src" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+  <target name="gwtc" depends="javac" description="GWT compile to JavaScript">
+    <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+      <classpath>
+        <pathelement location="src"/>
+        <path refid="project.class.path"/>
+      </classpath>
+      <!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
+        <jvmarg value="-Xmx600M"/>
+        <jvmarg value="-Xss32M"/>
+      <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+      <arg value="com.lexemus.task.Task"/>
+    	<arg value="-war" />
+    	<arg value="${build.dir}" />    
+    </java>
+  </target>
+
+  <target name="build" depends="gwtc" description="Build this project">
+    <zip destfile="C:/Users/Jack/Downloads/apache-tomcat-7.0.34/webapps/taskboard.war" basedir="${build.home}/war"/>
+  </target>
+
+</project>
